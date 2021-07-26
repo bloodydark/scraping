@@ -21,11 +21,9 @@ for i,content in enumerate(contents, start=1):
     print("="*30, i, "="*30)
     #取得したい都道府県を抽出
     prefectures = content.find("span", class_="areaOnecol")
-    # if not prefectures.find(text=re.compile("")):
-    #     continue
-    if i == 11:
-        break
-
+    if not prefectures.find(text=re.compile("神奈川県")):
+        continue
+    
     facility_name = content.find("div", class_="titleOnecol").find("a").text
     a_tag = content.find("a").get("href")
     page_url = base_url + a_tag + "#congestionInfo"
@@ -64,12 +62,6 @@ for i,content in enumerate(contents, start=1):
         "/congestion/images/crowd_icon/04_crowd.png": "😥",
         "/congestion/images/crowd_icon/05_much_crowd.png": "🥵",
         "/congestion/images/crowd_icon/06_close.png": "営業時間外",
-        # "/congestion/images/crowd_icon/01_not_crowd.png": "😄空いている",
-        # "/congestion/images/crowd_icon/02_normal.png": "😃やや空いている",
-        # "/congestion/images/crowd_icon/03_little_crowd.png": "😀普通",
-        # "/congestion/images/crowd_icon/04_crowd.png": "😥やや混雑",
-        # "/congestion/images/crowd_icon/05_much_crowd.png": "🥵混雑",
-        # "/congestion/images/crowd_icon/06_close.png": "営業時間外",
     }
     
     
@@ -95,7 +87,7 @@ for i,content in enumerate(contents, start=1):
         "施設名": facility_name,
         "住所": address,
         "評価(5点満点)": evaluation,
-        "混雑状況(😄空いている,😃やや空いている,😀普通,😥やや混雑,🥵混雑)"
+        "混雑状況 (😄空いている,😃やや空いている,😀普通,😥やや混雑,🥵混雑)"
         : f"{updated_date} / {congestion_list}",
         # "混雑状況": f"{updated_date} / {congestion_list}",
         "営業時間": business_hour,
@@ -108,5 +100,5 @@ for i,content in enumerate(contents, start=1):
 
 print(d_list)
 df = pd.DataFrame(d_list)
-df.to_csv("test.csv", index=None, encoding="utf-8-sig")
+df.to_csv("kanagawa.csv", index=None, encoding="utf-8-sig")
 
