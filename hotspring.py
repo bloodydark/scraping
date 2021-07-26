@@ -21,8 +21,10 @@ for i,content in enumerate(contents, start=1):
     print("="*30, i, "="*30)
     #取得したい都道府県を抽出
     prefectures = content.find("span", class_="areaOnecol")
-    if not prefectures.find(text=re.compile("東京都")):
-        continue
+    # if not prefectures.find(text=re.compile("")):
+    #     continue
+    if i == 3:
+        break
 
     facility_name = content.find("div", class_="titleOnecol").find("a").text
     a_tag = content.find("a").get("href")
@@ -56,11 +58,11 @@ for i,content in enumerate(contents, start=1):
 
     #混雑状況の絵と人数の対応リスト
     number_list = {
-        "/congestion/images/crowd_icon/01_not_crowd.png": "空いている",
-        "/congestion/images/crowd_icon/02_normal.png": "やや空いている",
-        "/congestion/images/crowd_icon/03_little_crowd.png": "普通",
-        "/congestion/images/crowd_icon/04_crowd.png": "やや混雑",
-        "/congestion/images/crowd_icon/05_much_crowd.png": "混雑",
+        "/congestion/images/crowd_icon/01_not_crowd.png": "😄空いている",
+        "/congestion/images/crowd_icon/02_normal.png": "😃やや空いている",
+        "/congestion/images/crowd_icon/03_little_crowd.png": "😀普通",
+        "/congestion/images/crowd_icon/04_crowd.png": "😕やや混雑",
+        "/congestion/images/crowd_icon/05_much_crowd.png": "🥵混雑",
         "/congestion/images/crowd_icon/06_close.png": "営業時間外",
     }
     
@@ -97,4 +99,5 @@ for i,content in enumerate(contents, start=1):
 
 print(d_list)
 df = pd.DataFrame(d_list)
-df.to_csv("tokyo.csv", index=None, encoding="utf-8-sig")
+df.to_csv("test.csv", index=None, encoding="utf-8-sig")
+
