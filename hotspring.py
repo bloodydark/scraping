@@ -21,10 +21,10 @@ for i,content in enumerate(contents, start=1):
     print("="*30, i, "="*30)
     #取得したい都道府県を抽出
     prefectures = content.find("span", class_="areaOnecol")
-    if not prefectures.find(text=re.compile("東京都")):
+    if not prefectures.find(text=re.compile("神奈川県")):
         continue
 
-    title = content.find("div", class_="titleOnecol").find("a").text
+    facility_name = content.find("div", class_="titleOnecol").find("a").text
     a_tag = content.find("a").get("href")
     page_url = base_url + a_tag + "#congestionInfo"
     #このページは動的なためrequsts_htmlライブラリが必要
@@ -34,22 +34,20 @@ for i,content in enumerate(contents, start=1):
     print(r.status_code)
     sleep(3)
     page_soup = r.html
-    updated_date = page_soup.find("p.currentState", first=True).text
     evaluation = page_soup.find("dl.evaluation1", first=True).find("span.score", first=True).text
-    congestions = page_soup.find("div.mdl-card-height", first=False)
     outlines = page_soup.find("div.outlineInner2",first=True).find("tr", first=False)
     address = outlines[2].find("td", first=True).text
     
-    if outlines[4].find("td", first=True):
+    if outlines[4].find("th", first=True).text == "営業時間":
         business_hour = outlines[4].find("td", first=True).text
     else:
          business_hour = "非掲載"
-    official_hp = page_soup.find("div.outlineInner2",first=True).find("a", first=True).text
     if  page_soup.find("dl.dateList1", first=True):
         price = page_soup.find("dl.dateList1", first=True).text
     else:
         price = "非掲載"
 
+    official_hp = page_soup.find("div.outlineInner2",first=True).find("a", first=True).text
     access = page_soup.find("dl.dateList2", first=True).find("dd", first=False)[0].text
 
     #混雑状況の絵と人数の対応リスト
@@ -64,6 +62,8 @@ for i,content in enumerate(contents, start=1):
     
     #混雑状況リスト
     congestion_list = []
+    updated_date = page_soup.find("p.currentState", first=True).text
+    congestions = page_soup.find("div.mdl-card-height", first=False)
     for congestion in congestions:
         area = congestion.find("h3.mdl-card__title-text", first=True).text
         try:
@@ -79,11 +79,11 @@ for i,content in enumerate(contents, start=1):
         sleep(1)
 
     d_list.append({
-        "施設名": title,
+        "施設名": facility_name,
         "住所": address,
-        "営業時間": business_hour,
         "評価(5点満点)": evaluation,
         "混雑状況": f"{congestion_list} \n {updated_date}",
+        "営業時間": business_hour,
         "価格": price,
         "アクセス": access,
         "公式HP": official_hp 
@@ -93,4 +93,4 @@ for i,content in enumerate(contents, start=1):
 
 print(d_list)
 df = pd.DataFrame(d_list)
-df.to_csv("tokyo.csv", index=None, encoding="utf-8-sig")
+df.to_csv("kanagawa.csv", index=None, encoding="utf-8-sig")
