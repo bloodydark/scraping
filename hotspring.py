@@ -21,7 +21,7 @@ for i,content in enumerate(contents, start=1):
     print("="*30, i, "="*30)
     #取得したい都道府県を抽出
     prefectures = content.find("span", class_="areaOnecol")
-    if not prefectures.find(text=re.compile("栃木県")):
+    if not prefectures.find(text=re.compile("東京都")):
         continue
 
     facility_name = content.find("div", class_="titleOnecol").find("a").text
@@ -97,4 +97,4 @@ for i,content in enumerate(contents, start=1):
 
 print(d_list)
 df = pd.DataFrame(d_list)
-df.to_csv("tochigi.csv", index=None, encoding="utf-8-sig")
+df.to_csv("tokyo.csv", index=None, encoding="utf-8-sig")
