@@ -23,7 +23,7 @@ for i,content in enumerate(contents, start=1):
     prefectures = content.find("span", class_="areaOnecol")
     # if not prefectures.find(text=re.compile("")):
     #     continue
-    if i == 3:
+    if i == 11:
         break
 
     facility_name = content.find("div", class_="titleOnecol").find("a").text
@@ -58,13 +58,20 @@ for i,content in enumerate(contents, start=1):
 
     #混雑状況の絵と人数の対応リスト
     number_list = {
-        "/congestion/images/crowd_icon/01_not_crowd.png": "😄空いている",
-        "/congestion/images/crowd_icon/02_normal.png": "😃やや空いている",
-        "/congestion/images/crowd_icon/03_little_crowd.png": "😀普通",
-        "/congestion/images/crowd_icon/04_crowd.png": "😕やや混雑",
-        "/congestion/images/crowd_icon/05_much_crowd.png": "🥵混雑",
+        "/congestion/images/crowd_icon/01_not_crowd.png": "😄",
+        "/congestion/images/crowd_icon/02_normal.png": "😃",
+        "/congestion/images/crowd_icon/03_little_crowd.png": "😀",
+        "/congestion/images/crowd_icon/04_crowd.png": "😥",
+        "/congestion/images/crowd_icon/05_much_crowd.png": "🥵",
         "/congestion/images/crowd_icon/06_close.png": "営業時間外",
+        # "/congestion/images/crowd_icon/01_not_crowd.png": "😄空いている",
+        # "/congestion/images/crowd_icon/02_normal.png": "😃やや空いている",
+        # "/congestion/images/crowd_icon/03_little_crowd.png": "😀普通",
+        # "/congestion/images/crowd_icon/04_crowd.png": "😥やや混雑",
+        # "/congestion/images/crowd_icon/05_much_crowd.png": "🥵混雑",
+        # "/congestion/images/crowd_icon/06_close.png": "営業時間外",
     }
+    
     
     #混雑状況リスト
     congestion_list = []
@@ -88,7 +95,9 @@ for i,content in enumerate(contents, start=1):
         "施設名": facility_name,
         "住所": address,
         "評価(5点満点)": evaluation,
-        "混雑状況": f"{congestion_list} \n {updated_date}",
+        "混雑状況(😄空いている,😃やや空いている,😀普通,😥やや混雑,🥵混雑)"
+        : f"{updated_date} / {congestion_list}",
+        # "混雑状況": f"{updated_date} / {congestion_list}",
         "営業時間": business_hour,
         "価格": price,
         "アクセス": access,
