@@ -21,11 +21,8 @@ for i,content in enumerate(contents, start=1):
     print("="*30, i, "="*30)
     #取得したい都道府県を抽出
     prefectures = content.find("span", class_="areaOnecol")
-    # if not prefectures.find(text=re.compile("埼玉県")):
-    #     continue
-
-    if i == 3:
-        break
+    if not prefectures.find(text=re.compile("東京都")):
+        continue
 
     title = content.find("div", class_="titleOnecol").find("a").text
     a_tag = content.find("a").get("href")
@@ -42,9 +39,17 @@ for i,content in enumerate(contents, start=1):
     congestions = page_soup.find("div.mdl-card-height", first=False)
     outlines = page_soup.find("div.outlineInner2",first=True).find("tr", first=False)
     address = outlines[2].find("td", first=True).text
-    business_hour = outlines[4].find("td", first=True).text
+    
+    if outlines[4].find("td", first=True):
+        business_hour = outlines[4].find("td", first=True).text
+    else:
+         business_hour = "非掲載"
     official_hp = page_soup.find("div.outlineInner2",first=True).find("a", first=True).text
-    price = page_soup.find("dl.dateList1", first=True).text
+    if  page_soup.find("dl.dateList1", first=True):
+        price = page_soup.find("dl.dateList1", first=True).text
+    else:
+        price = "非掲載"
+
     access = page_soup.find("dl.dateList2", first=True).find("dd", first=False)[0].text
 
     #混雑状況の絵と人数の対応リスト
@@ -87,5 +92,5 @@ for i,content in enumerate(contents, start=1):
     print(d_list)
 
 print(d_list)
-# df = pd.DataFrame(d_list)
-# df.to_csv("test.csv", index=None, encoding="utf-8-sig")
+df = pd.DataFrame(d_list)
+df.to_csv("tokyo.csv", index=None, encoding="utf-8-sig")
