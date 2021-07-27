@@ -1,9 +1,9 @@
 from time import sleep
-from requests_html import HTMLSession
+import re
 import requests
 from bs4 import BeautifulSoup
+from requests_html import HTMLSession
 import pandas as pd
-import re
 
 url = "https://onsen.nifty.com/ip-konzatsu/"
 base_url = "https://onsen.nifty.com"
@@ -27,9 +27,11 @@ for i,content in enumerate(contents, start=1):
     facility_name = content.find("div", class_="titleOnecol").find("a").text
     a_tag = content.find("a").get("href")
     page_url = base_url + a_tag + "#congestionInfo"
-    #このページは動的なためrequsts_htmlライブラリが必要
+    #このページはjavascriptを使用した動的なページのため
+    # requsts_htmlライブラリのHTMLSessionモジュールが必要
     s = HTMLSession()
     r = s.get(page_url,timeout=3)
+    #ここでページのレンダリング
     r.html.render(timeout=20)
     print(r.status_code)
     sleep(3)
@@ -43,7 +45,7 @@ for i,content in enumerate(contents, start=1):
     else:
          business_hour = "非掲載"
     if  page_soup.find("dl.dateList1", first=True):
-        price = page_soup.find("dl.dateList1", first=True).text
+        price = page_soup.find("dl.dateList1", first=True).find("dd",first=True).text
     else:
         price = "非掲載"
 
@@ -54,16 +56,15 @@ for i,content in enumerate(contents, start=1):
 
     access = page_soup.find("dl.dateList2", first=True).find("dd", first=False)[0].text
 
-    #混雑状況の絵と人数の対応リスト
+    #混雑状況の絵と絵文字の対応リスト
     number_list = {
         "/congestion/images/crowd_icon/01_not_crowd.png": "😄",
         "/congestion/images/crowd_icon/02_normal.png": "😃",
         "/congestion/images/crowd_icon/03_little_crowd.png": "😀",
-        "/congestion/images/crowd_icon/04_crowd.png": "😥",
+        "/congestion/images/crowd_icon/04_crowd.png": "😰",
         "/congestion/images/crowd_icon/05_much_crowd.png": "🥵",
         "/congestion/images/crowd_icon/06_close.png": "営業時間外",
     }
-    
     
     #混雑状況リスト
     congestion_list = []
@@ -86,8 +87,8 @@ for i,content in enumerate(contents, start=1):
     d_list.append({
         "施設名": facility_name,
         "住所": address,
-        "評価(5点満点)": evaluation,
-        "混雑状況 (😄空いている,😃やや空いている,😀普通,😥やや混雑,🥵混雑)"
+        "評価 (5点満点)": evaluation,
+        "混雑状況 (😄空いている、😃やや空いている、😀普通、😰やや混雑、🥵混雑)"
         : f"{updated_date} / {congestion_list}",
         # "混雑状況": f"{updated_date} / {congestion_list}",
         "営業時間": business_hour,
@@ -99,6 +100,8 @@ for i,content in enumerate(contents, start=1):
     print(d_list)
 
 print(d_list)
+#pandasを使って、データを表にする
 df = pd.DataFrame(d_list)
+#表をcsv形式で出力する
 df.to_csv("kanagawa.csv", index=None, encoding="utf-8-sig")
 
