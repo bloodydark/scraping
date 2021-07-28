@@ -6,9 +6,9 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import re
 
-#リアルタイム混雑状況を導入している施設が表示されているページurl
+#リアルタイム混雑状況を導入している施設一覧ページのurl
 url = "https://onsen.nifty.com/ip-konzatsu/"
-#ニフティ温泉のメインンページ
+#ニフティ温泉のメインンページのurl
 base_url = "https://onsen.nifty.com"
 
 #アクセス結果を、変数rに格納
@@ -27,7 +27,8 @@ d_list = []
 
 #各温泉施設の情報を取得
 for i,content in enumerate(contents, start=1):
-    #取得したい都道府県を抽出
+    #取得したい都道府県を抽出、都道府県毎ではページは分かれていないため、正規表現を使用し
+    #都道府県名と一致したら抽出するようにした。
     prefectures = content.find("span", class_="areaOnecol")
     if not prefectures.find(text=re.compile("埼玉県")):
         continue
@@ -36,8 +37,10 @@ for i,content in enumerate(contents, start=1):
     a_tag = content.find("a").get("href")
     #各施設の詳細ページリンクのurl
     page_url = base_url + a_tag + "#congestionInfo"
-    #このページはjavascriptを使用した動的なページのため
-    # requsts_htmlライブラリのHTMLSessionモジュールが必要
+    #このページはjavascriptを使用した動的なページのためBeautifulSoupを使用したら
+    #混雑状況の欄は取得することができなかった。そこで
+    # requsts_htmlライブラリのHTMLSessionモジュールを使用しhtmlをレンダリングしたら取得に成功した
+    #seleniumを使用しなかった理由は、実際にwebページにアクションを起こす必要が無かったためである。
     s = HTMLSession()
     r = s.get(page_url,timeout=3)
     #ここでページのレンダリング
@@ -70,6 +73,7 @@ for i,content in enumerate(contents, start=1):
     access = page_session.find("dl.dateList2", first=True).find("dd", first=False)[0].text
 
     #混雑状況の絵と絵文字の対応リスト
+    #始めは混雑状況を「空いている」等表現したが、実際表にしたら分かりにくかったため、絵文字を使用し見える化した。
     number_list = {
         "/congestion/images/crowd_icon/01_not_crowd.png": "😄",
         "/congestion/images/crowd_icon/02_normal.png": "😃",
@@ -83,7 +87,7 @@ for i,content in enumerate(contents, start=1):
     congestion_list = []
     #混雑状況の更新日時を取得
     updated_date = page_session.find("p.currentState", first=True).text
-    #混雑状況のエリア名と度合を取得
+    #混雑状況のエリア名と混雑度を取得
     congestions = page_session.find("div.mdl-card-height", first=False)
     for congestion in congestions:
         congested_area = congestion.find("h3.mdl-card__title-text", first=True).text
@@ -98,7 +102,7 @@ for i,content in enumerate(contents, start=1):
                 congested_area : number_of_people
             })
         sleep(1)
-    #pandasで表にしやすくするため、辞書型でリストに追加
+    #pandasで表にしやすくするため、辞書型でd_listのリストに追加
     d_list.append({
         "施設名": facility_name,
         "住所": address,
@@ -111,9 +115,7 @@ for i,content in enumerate(contents, start=1):
         "公式HP": official_hp 
     })
     sleep(1)
-    print(d_list)
 
-print(d_list)
 #pandasを使って、収集したデータを表にする
 df = pd.DataFrame(d_list)
 #表をcsv形式で出力する
