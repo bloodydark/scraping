@@ -21,7 +21,7 @@ for i,content in enumerate(contents, start=1):
     print("="*30, i, "="*30)
     #取得したい都道府県を抽出
     prefectures = content.find("span", class_="areaOnecol")
-    if not prefectures.find(text=re.compile("神奈川県")):
+    if not prefectures.find(text=re.compile("埼玉県")):
         continue
     
     facility_name = content.find("div", class_="titleOnecol").find("a").text
@@ -65,7 +65,7 @@ for i,content in enumerate(contents, start=1):
         "/congestion/images/crowd_icon/05_much_crowd.png": "🥵",
         "/congestion/images/crowd_icon/06_close.png": "営業時間外",
     }
-    
+    #"❌"
     #混雑状況リスト
     congestion_list = []
     updated_date = page_session.find("p.currentState", first=True).text
@@ -103,5 +103,5 @@ print(d_list)
 #pandasを使って、収集したデータを表にする
 df = pd.DataFrame(d_list)
 #表をcsv形式で出力する
-df.to_csv("kanagawa.csv", index=None, encoding="utf-8-sig")
+df.to_csv("saitama.csv", index=None, encoding="utf-8-sig")
 
