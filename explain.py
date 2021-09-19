@@ -30,7 +30,7 @@ for i,content in enumerate(contents, start=1):
     #取得したい都道府県を抽出、都道府県毎ではページは分かれていないため、正規表現を使用し
     #都道府県名と一致したら抽出するようにした。
     prefectures = content.find("span", class_="areaOnecol")
-    if not prefectures.find(text=re.compile("埼玉県")):
+    if not prefectures.find(text=re.compile("東京都")):
         continue
     #施設名を取得
     facility_name = content.find("div", class_="titleOnecol").find("a").text
@@ -119,5 +119,5 @@ for i,content in enumerate(contents, start=1):
 #pandasを使って、収集したデータを表にする
 df = pd.DataFrame(d_list)
 #表をcsv形式で出力する
-df.to_csv("saitama.csv", index=None, encoding="utf-8-sig")
+df.to_csv("tokyo.csv", index=None, encoding="utf-8-sig")
 
